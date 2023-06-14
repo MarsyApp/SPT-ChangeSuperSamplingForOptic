@@ -61,7 +61,7 @@ namespace ChangeSuperSamplingForOptic
             float configSuperSamplingFactor = ChangeSuperSamplingForOpticConfig.SuperSampling.Value;
             if (configSuperSamplingFactor < defaultSuperSamplingFactor)
             {
-                SetSuperSampling(configSuperSamplingFactor);
+                SetSuperSampling(1f - configSuperSamplingFactor);
             }
         }
         
