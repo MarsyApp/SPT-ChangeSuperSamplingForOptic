@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using Aki.Reflection.Patching;
-using ChangeSuperSamplingForOptic.Configs;
+using DynamicExternalResolution.Configs;
 using Comfort.Common;
 using EFT;
 using EFT.CameraControl;
 using UnityEngine;
 using EFT.Settings.Graphics;
 
-namespace ChangeSuperSamplingForOptic
+namespace DynamicExternalResolution
 {
     class Patcher
     {
@@ -29,9 +29,9 @@ namespace ChangeSuperSamplingForOptic
         {
             this._patches = new List<ModulePatch>
             {
-                new ChangeSuperSamplingForOpticPatches.OpticSightOnEnablePath(),
-                new ChangeSuperSamplingForOpticPatches.OpticSightOnDisablePath(),
-                new ChangeSuperSamplingForOpticPatches.ClientFirearmControllerChangeAimingModePath(),
+                new DynamicExternalResolutionPatches.OpticSightOnEnablePath(),
+                new DynamicExternalResolutionPatches.OpticSightOnDisablePath(),
+                new DynamicExternalResolutionPatches.ClientFirearmControllerChangeAimingModePath(),
             };
         }
 
@@ -54,34 +54,26 @@ namespace ChangeSuperSamplingForOptic
         private readonly List<ModulePatch> _patches;
     }
 
-    public static class ChangeSuperSamplingForOpticPatches
+    public static class DynamicExternalResolutionPatches
     {
         private static void SetResolutionAim()
         {
-            //bool DLSSEnabled = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.DLSSEnabled;
             bool FSREnabled = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSREnabled;
             bool FSR2Enabled = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSR2Enabled;
 
             float defaultSuperSamplingFactor = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.SuperSamplingFactor;
-            float configSuperSamplingFactor = ChangeSuperSamplingForOpticConfig.SuperSampling.Value;
-
-            //EDLSSMode defaultDLSSMode = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.DLSSMode;
-            //EDLSSMode configDLSSMode = ChangeSuperSamplingForOpticConfig.DLSSMode.Value;
+            float configSuperSamplingFactor = DynamicExternalResolutionConfig.SuperSampling.Value;
 
             EFSRMode defaultFSRMode = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSRMode;
-            EFSRMode configFSRMode = ChangeSuperSamplingForOpticConfig.FSRMode.Value;
+            EFSRMode configFSRMode = DynamicExternalResolutionConfig.FSRMode.Value;
 
             EFSR2Mode defaultFSR2Mode = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSR2Mode;
-            EFSR2Mode configFSR2Mode = ChangeSuperSamplingForOpticConfig.FSR2Mode.Value;
+            EFSR2Mode configFSR2Mode = DynamicExternalResolutionConfig.FSR2Mode.Value;
 
             if (!FSREnabled && !FSR2Enabled && (configSuperSamplingFactor < defaultSuperSamplingFactor))
             {
                 SetSuperSampling(1f - configSuperSamplingFactor);
             }
-            //else if (DLSSEnabled && (configDLSSMode != defaultDLSSMode))
-            //{
-            //    SetDLSS(configDLSSMode);
-            //}
             else if (FSREnabled && (configFSRMode != defaultFSRMode))
             {
                 SetFSR(configFSRMode);
@@ -94,12 +86,10 @@ namespace ChangeSuperSamplingForOptic
 
         private static void SetResolutionDefault()
         {
-            //bool DLSSEnabled = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.DLSSEnabled;
             bool FSREnabled = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSREnabled;
             bool FSR2Enabled = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSR2Enabled;
 
             float defaultSuperSamplingFactor = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.SuperSamplingFactor;
-            //EDLSSMode defaultDLSSMode = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.DLSSMode;
             EFSRMode defaultFSRMode = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSRMode;
             EFSR2Mode defaultFSR2Mode = Singleton<SharedGameSettingsClass>.Instance.Graphics.Settings.FSR2Mode;
 
@@ -107,10 +97,6 @@ namespace ChangeSuperSamplingForOptic
             {
                 SetSuperSampling(defaultSuperSamplingFactor);
             }
-            //else if (DLSSEnabled)
-            //{
-            //    SetDLSS(defaultDLSSMode);
-            //}
             else if (FSREnabled)
             {
                 SetFSR(defaultFSRMode);
@@ -123,25 +109,16 @@ namespace ChangeSuperSamplingForOptic
 
         private static void SetSuperSampling(float value)
         {
-            CameraClass camera = ChangeSuperSamplingForOptic.getCameraInstance();
+            CameraClass camera = DynamicExternalResolution.getCameraInstance();
             if (camera != null)
             {
                 camera.SetSuperSampling(Mathf.Clamp(value, 0.01f, 1f));
             }
         }
-        
-        //private static void SetDLSS(EDLSSMode value)
-        //{
-        //    CameraClass camera = ChangeSuperSamplingForOptic.getCameraInstance();
-        //    if (camera != null)
-        //    {
-        //        camera.SetDLSS(value);
-        //    }
-        //}
 
         private static void SetFSR(EFSRMode value)
         {
-            CameraClass camera = ChangeSuperSamplingForOptic.getCameraInstance();
+            CameraClass camera = DynamicExternalResolution.getCameraInstance();
             if (camera != null)
             {
                 camera.SetFSR(value);
@@ -150,7 +127,7 @@ namespace ChangeSuperSamplingForOptic
 
         private static void SetFSR2(EFSR2Mode value)
         {
-            CameraClass camera = ChangeSuperSamplingForOptic.getCameraInstance();
+            CameraClass camera = DynamicExternalResolution.getCameraInstance();
             if (camera != null)
             {
                 camera.SetFSR2(value);
@@ -167,11 +144,11 @@ namespace ChangeSuperSamplingForOptic
             [PatchPostfix]
             private static void PatchPostfix()
             {
-                if (!ChangeSuperSamplingForOpticConfig.EnableMod.Value)
+                if (!DynamicExternalResolutionConfig.EnableMod.Value)
                 {
                     return;
                 }
-                Player localPlayer = ChangeSuperSamplingForOptic.getPlayetInstance();
+                Player localPlayer = DynamicExternalResolution.getPlayetInstance();
                 if(localPlayer != null && localPlayer.ProceduralWeaponAnimation != null && localPlayer.ProceduralWeaponAnimation.IsAiming && localPlayer.ProceduralWeaponAnimation.CurrentAimingMod != null && localPlayer.ProceduralWeaponAnimation.CurrentScope != null)
                 {
                     if (localPlayer.ProceduralWeaponAnimation.CurrentScope.IsOptic)
@@ -192,7 +169,7 @@ namespace ChangeSuperSamplingForOptic
             [PatchPostfix]
             private static void PatchPostfix()
             {
-                Player localPlayer = ChangeSuperSamplingForOptic.getPlayetInstance();
+                Player localPlayer = DynamicExternalResolution.getPlayetInstance();
 
                 if (localPlayer != null && localPlayer.ProceduralWeaponAnimation != null)
                 {
@@ -211,7 +188,7 @@ namespace ChangeSuperSamplingForOptic
             [PatchPostfix]
             private static void PatchPostfix()
             {
-                Player localPlayer = ChangeSuperSamplingForOptic.getPlayetInstance();
+                Player localPlayer = DynamicExternalResolution.getPlayetInstance();
                 
                 if(localPlayer != null && localPlayer.ProceduralWeaponAnimation != null && localPlayer.ProceduralWeaponAnimation.IsAiming && localPlayer.ProceduralWeaponAnimation.CurrentAimingMod != null && localPlayer.ProceduralWeaponAnimation.CurrentScope != null)
                 {
