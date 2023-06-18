@@ -1,11 +1,11 @@
 ﻿using BepInEx;
-using ChangeSuperSamplingForOptic.Configs;
+using DynamicExternalResolution.Configs;
 using EFT;
 
-namespace ChangeSuperSamplingForOptic
+namespace DynamicExternalResolution
 {
-    [BepInPlugin("com.MarsyApp.ChangeSuperSamplingForOptic", "MarsyApp-ChangeSuperSamplingForOptic", "1.0.0")]
-    public class ChangeSuperSamplingForOptic : BaseUnityPlugin
+    [BepInPlugin("com.DynamicExternalResolution", "Dynamic External Resolution", "2.0")]
+    public class DynamicExternalResolution : BaseUnityPlugin
     {
         static Player _localPlayer = null;
         
@@ -35,15 +35,15 @@ namespace ChangeSuperSamplingForOptic
         
         private void Awake()
         {
-            ChangeSuperSamplingForOpticConfig.Init(Config);
+            DynamicExternalResolutionConfig.Init(Config);
             Patcher.PatchAll();
-            Logger.LogInfo($"Plugin ChangeSuperSamplingForOpticMod is loaded!");
+            Logger.LogInfo($"Plugin Dynamic External Resolution is loaded!");
         }
         
         private void OnDestroy()
         {
             Patcher.UnpatchAll();
-            Logger.LogInfo($"Plugin ChangeSuperSamplingForOpticMod is unloaded!");
+            Logger.LogInfo($"Plugin DynamicExternalResolution is unloaded!");
         }
     }
 }
